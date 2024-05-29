@@ -1,4 +1,4 @@
-local_path = --settings=config.settings.local_settings
+local_path = --settings=config.django.local_settings
 
 run:
 	python manage.py runserver $(local_path)

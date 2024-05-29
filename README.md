@@ -3,10 +3,6 @@ DRF로 간단한 단축 URL 챌린지
 <br>
 기능 단위에 초점을 맞춰 커밋하고, 이슈 및 PR 생성
 
-- 기한: 5월 7일 ~ 21일
-    - 중간 점검 → 14일 (1주차)
-    - 최종 발표 → 21일 (2주차)
-
 <br>
 
 # 프로젝트 목적
@@ -54,4 +50,4 @@ DRF로 간단한 단축 URL 챌린지
 - Django 5.0.4
 - djangorestframework 3.15.1
 - drf-yasg 1.21.7
-- Mysql
+- postgresql
