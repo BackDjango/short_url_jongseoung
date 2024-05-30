@@ -15,10 +15,7 @@ class UniqueValidationError(CustomAPIException):
 
 class InvalidRequest(CustomAPIException):
     status_code = status.HTTP_401_UNAUTHORIZED
-    _msg = [
-        "INVALID-REQUEST",
-        "인가되지 않은 접근입니다. 유저 토큰 혹은 요청 파라미터를 확인해주세요.",
-    ]
+    _msg = ["INVALID-REQUEST", "인가되지 않은 접근입니다. 유저 토큰 혹은 요청 파라미터를 확인해주세요."]
 
 
 class InvalidPagination(CustomAPIException):
@@ -64,3 +61,13 @@ class UserPasswordInvalid(CustomAPIException):
 class UserIsNotAuthorized(CustomAPIException):
     status_code = status.HTTP_401_UNAUTHORIZED
     _msg = ["USER-NOT-AUTHORIZED", "차단되었거나 활성화되지 않은 유저입니다."]
+
+
+class URLIsNotAuthorized(CustomAPIException):
+    status_code = status.HTTP_401_UNAUTHORIZED
+    _msg = ["URL-NOT-AUTHORIZED", "허용되지 않은 url입니다."]
+
+
+class URLNotFound(CustomAPIException):
+    status_code = status.HTTP_404_NOT_FOUND
+    _msg = ["URL-NOT-FOUND", "URL을 찾을 수 없습니다."]
