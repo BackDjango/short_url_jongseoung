@@ -43,7 +43,7 @@ class ShortenerCreateSerializer(serializers.ModelSerializer):
             if len(short_url) > 7:
                 short_url = short_url[:7]
 
-            validated_data["short_url"] = "localhost:8000/api/v1/" + short_url
+            validated_data["short_url"] = short_url
 
             return super().create(validated_data)
 
@@ -67,7 +67,7 @@ class ShortenerRedirectSerializer(serializers.Serializer):
 
     def validate_short_url(self, value):
         try:
-            short_url_instance = ShortURL.objects.get(short_url="localhost:8000/api/v1/" + value)
+            short_url_instance = ShortURL.objects.get(short_url=value)
             if short_url_instance.expiration_date < datetime.now():
                 if short_url_instance.is_active:
                     self.save(is_active=False)

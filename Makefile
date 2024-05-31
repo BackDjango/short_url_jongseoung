@@ -16,7 +16,7 @@ startapp:
 	python manage.py startapp $(app) $(local_path)
 
 test:
-	python manage.py test $(local_path)
+	python manage.py test $(local_path) --keepdb --verbosity=2
 
 mkfreeze:
 	pip freeze > requirements.txt
