@@ -1,11 +1,12 @@
 import hashlib
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from django.contrib.auth.models import AnonymousUser
 from django.shortcuts import redirect
+from django.utils import timezone
 from rest_framework import serializers
 
-from api.models.shorteners.models import ShortURL
+from api.models.shorteners.models import DailyCount, ShortURL
 from core.exceptions.service_exceptions import *
 
 
@@ -61,6 +62,22 @@ class ShortenerCreateSerializer(serializers.ModelSerializer):
 
         return result
 
+    def get_weekly_count(self, instance):
+        today = timezone.now().date()
+        seven_days_ago = today - timedelta(days=7)
+        counts = DailyCount.objects.filter(short_url=instance, date__gte=seven_days_ago)
+
+        weekly_count = sum(count.count for count in counts)
+        return weekly_count
+
+    def get_daily_count(self, instance):
+        today = timezone.now().date()
+        seven_days_ago = today - timedelta(days=7)
+        counts = DailyCount.objects.filter(short_url=instance, date__gte=seven_days_ago)
+
+        result = {count.date.isoformat(): count.count for count in counts}
+        return result
+
 
 class ShortenerRedirectSerializer(serializers.Serializer):
     short_url = serializers.CharField(max_length=7, required=True, label="Short URL")
@@ -70,13 +87,24 @@ class ShortenerRedirectSerializer(serializers.Serializer):
             short_url_instance = ShortURL.objects.get(short_url=value)
             if short_url_instance.expiration_date < datetime.now():
                 if short_url_instance.is_active:
-                    self.save(is_active=False)
-                raise URLIsNotAuthorized
+                    short_url_instance.is_active = False
+                    short_url_instance.save()
+                    raise URLIsNotAuthorized
             short_url_instance.request_count += 1
             short_url_instance.save()
+            self.plus_daily_count(short_url_instance)
             return short_url_instance.origin_url
         except ShortURL.DoesNotExist:
             raise URLNotFound
+
+    def plus_daily_count(self, instance):
+        today = timezone.now().date()
+        try:
+            daily_count = DailyCount.objects.get(short_url=instance, date=today)
+            daily_count.count += 1
+            daily_count.save()
+        except DailyCount.DoesNotExist:
+            DailyCount.objects.create(short_url=instance, date=today)
 
     def perform_redirect(self):
         origin_url = self.validated_data["short_url"]

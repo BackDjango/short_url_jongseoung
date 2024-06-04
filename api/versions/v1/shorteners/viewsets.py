@@ -15,7 +15,11 @@ class ShortenerViewSet(
     SimpleJWTMixin,
     GenericViewSet,
 ):
-    serializer_action_map = {"create": ShortenerCreateSerializer, "redirect": ShortenerRedirectSerializer}
+    serializer_action_map = {
+        "create": ShortenerCreateSerializer,
+        "redirect": ShortenerRedirectSerializer,
+        "statistics": ShortenerCreateSerializer,
+    }
     queryset = ShortURL.objects.filter(is_active=True)
     lookup_field = "short_url"
 
@@ -41,3 +45,15 @@ class ShortenerViewSet(
         serializer = self.get_serializer(data=kwargs)
         serializer.is_valid(raise_exception=True)
         return serializer.perform_redirect()
+
+    def statistics(self, request, *args, **kwargs):
+        instance = self.get_object()
+        serializer = self.get_serializer(instance)
+
+        res = {
+            "origin_url": instance.origin_url,
+            "request_count": instance.request_count,
+            "daily_count": serializer.get_daily_count(instance),
+            "weekly_count": serializer.get_weekly_count(instance),
+        }
+        return Response(res)

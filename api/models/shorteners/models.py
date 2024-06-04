@@ -13,3 +13,14 @@ class ShortURL(TimeStampedModel):
 
     class Meta:
         db_table = "short_url"
+
+
+class DailyCount(models.Model):
+    short_url = models.ForeignKey(ShortURL, related_name="daily_counts", on_delete=models.CASCADE)
+    date = models.DateField(verbose_name="날짜")
+    count = models.IntegerField(default=1, verbose_name="요청 횟수")
+
+    class Meta:
+        db_table = "daily_count"
+        unique_together = ("short_url", "date")
+        indexes = [models.Index(fields=["short_url", "date"])]
